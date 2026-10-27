@@ -166,6 +166,48 @@ body {
   }
 }
 
+.advent-credit {
+  display: inline-block;
+  width: 26ch;
+  max-width: 100%;
+  overflow: hidden;
+  border-right: 1px solid currentColor;
+  white-space: nowrap;
+  animation: advent-credit-type 5s steps(27, end) infinite, advent-credit-caret 0.8s step-end infinite;
+}
+
+.advent-credit:focus-visible {
+  width: 26ch;
+  animation: none;
+}
+
+@keyframes advent-credit-type {
+  0%,
+  12% {
+    width: 0;
+  }
+
+  58%,
+  82% {
+    width: 26ch;
+  }
+
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes advent-credit-caret {
+  0%,
+  100% {
+    border-color: currentColor;
+  }
+
+  50% {
+    border-color: transparent;
+  }
+}
+
 @media (max-width: 640px) {
   .home-loading-screen {
     padding: 2.5rem 1rem;
@@ -175,12 +217,18 @@ body {
 /* Accessibility: respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .home-loading-logo-wrap,
-  .home-loading-track span {
+  .home-loading-track span,
+  .advent-credit {
     animation: none;
   }
 
   .home-loading-track span {
     width: 100%;
+  }
+
+  .advent-credit {
+    width: auto;
+    border-right: 0;
   }
 }
 

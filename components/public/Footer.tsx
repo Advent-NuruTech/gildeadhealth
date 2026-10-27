@@ -45,9 +45,17 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-2 border-t border-white/25 pt-6 text-xs text-white/80 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-3 border-t border-white/25 pt-6 text-xs text-white/80 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
           <p>© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
-          <p>Powered by Advent Nurutech</p>
+          <a
+            href="https://wa.me/254142225233?text=Hi%20Advent%2C%20I%20am%20from%20the%20Gilead%20Medicare%20website.%20I%20want%20your%20services."
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Message Advent Nurutech on WhatsApp about services"
+            className="advent-credit self-center rounded-sm font-semibold text-white transition hover:text-[#008EFE] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:justify-self-center"
+          >
+            Powered by Advent Nurutech
+          </a>
         </div>
       </div>
     </footer>
