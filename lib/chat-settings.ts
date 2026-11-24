@@ -3,20 +3,18 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { CHAT_SETTINGS_TAG } from "@/lib/cache-tags";
 import { firestore, firestoreConfigured } from "@/lib/firestore";
+import { serviceAreas } from "@/lib/site-config";
 import type { ChatCategory, ChatSettings } from "@/lib/types";
 
+const DEFAULT_DIRECT_PHONE = "254721627977";
+
 export const DEFAULT_CHAT_SETTINGS: ChatSettings = {
-  directPhone: "254721627977",
-  categories: [
-    { id: "study-materials", label: "Study Materials", phone: "254721627977" },
-    { id: "it-field", label: "IT Field", phone: "254721627977" },
-    { id: "photocopiers", label: "Photocopiers", phone: "254721627977" },
-    { id: "computers", label: "Computers", phone: "254721627977" },
-    { id: "homeschooling", label: "Homeschooling", phone: "254746840322" },
-    { id: "agriculture", label: "Agriculture", phone: "254746840322" },
-    { id: "seeds", label: "Seeds", phone: "254746840322" },
-    { id: "health-products", label: "Health Products", phone: "254746840322" },
-  ],
+  directPhone: DEFAULT_DIRECT_PHONE,
+  categories: serviceAreas.map((area, index) => ({
+    id: `service-${index + 1}`,
+    label: area.title,
+    phone: DEFAULT_DIRECT_PHONE,
+  })),
 };
 
 export function normalizePhone(value: string): string {
