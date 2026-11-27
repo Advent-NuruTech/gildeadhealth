@@ -20,6 +20,7 @@ function responseMessage(payload: unknown): string {
 
 export default function FormDocumentViewer({ url, fileName, fileType, requiresAdmin = false }: Props) {
   const documentContainer = useRef<HTMLDivElement>(null);
+  const styleContainer = useRef<HTMLDivElement>(null);
   const [objectUrl, setObjectUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -51,11 +52,28 @@ export default function FormDocumentViewer({ url, fileName, fileType, requiresAd
         if (active) setObjectUrl(currentUrl);
         if (isDocx) {
           const { renderAsync } = await import("docx-preview");
-          if (active && documentContainer.current) {
+          if (active && documentContainer.current && styleContainer.current) {
             documentContainer.current.replaceChildren();
-            await renderAsync(await blob.arrayBuffer(), documentContainer.current, documentContainer.current, {
+            styleContainer.current.replaceChildren();
+            await renderAsync(blob, documentContainer.current, styleContainer.current, {
               inWrapper: true,
               breakPages: true,
+              ignoreLastRenderedPageBreak: false,
+              renderAltChunks: false,
+            });
+            documentContainer.current.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((anchor) => {
+              const href = anchor.getAttribute("href") ?? "";
+              if (href.startsWith("#")) return;
+              try {
+                const protocol = new URL(href, window.location.href).protocol;
+                if (!["http:", "https:", "mailto:"].includes(protocol)) anchor.removeAttribute("href");
+                else if (protocol === "http:" || protocol === "https:") {
+                  anchor.target = "_blank";
+                  anchor.rel = "noopener noreferrer";
+                }
+              } catch {
+                anchor.removeAttribute("href");
+              }
             });
           }
         }
@@ -71,6 +89,7 @@ export default function FormDocumentViewer({ url, fileName, fileType, requiresAd
       active = false;
       if (currentUrl) URL.revokeObjectURL(currentUrl);
       documentContainer.current?.replaceChildren();
+      styleContainer.current?.replaceChildren();
     };
   }, [url, requiresAdmin, isDocx]);
 
@@ -86,7 +105,7 @@ export default function FormDocumentViewer({ url, fileName, fileType, requiresAd
       {loading && <p role="status" className="py-8 text-center text-sm text-slate-600">Opening document preview…</p>}
       {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error} Use the download button if it is available.</p>}
       {!loading && !error && isPdf && objectUrl && <iframe title={`${fileName} preview`} src={objectUrl} className="h-[65vh] min-h-96 w-full rounded-lg border border-slate-200 bg-white" />}
-      {!loading && !error && isDocx && <div ref={documentContainer} className="max-h-[70vh] overflow-auto rounded-lg bg-slate-200 p-3 sm:p-5" />}
+      {!loading && !error && isDocx && <><div ref={styleContainer} /><div ref={documentContainer} className="max-h-[70vh] overflow-auto rounded-lg bg-slate-200 p-3 sm:p-5" /></>}
       {!loading && !error && !isPdf && !isDocx && <p className="rounded-lg bg-white p-4 text-sm text-slate-600">This document format cannot be previewed in the browser. Download it to view and complete it.</p>}
     </section>
   );

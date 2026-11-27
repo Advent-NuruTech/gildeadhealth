@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { CheckCircle2, Download, Eye, FileText, RefreshCw, ShieldCheck, Upload } from "lucide-react";
+import { CheckCircle2, Download, Eye, FileText, RefreshCw, Share2, ShieldCheck, Upload } from "lucide-react";
 import { api } from "@/lib/api";
 import { FORM_MAX_BYTES, type FormTemplate } from "@/lib/forms-config";
 import FormDocumentViewer from "@/components/public/FormDocumentViewer";
@@ -26,6 +26,16 @@ export default function FormsPage() {
     return () => { active = false; };
   }, [retry]);
 
+  useEffect(() => {
+    if (loading) return;
+    const formId = new URLSearchParams(window.location.search).get("form");
+    if (formId) {
+      const hashId = window.location.hash.slice(1);
+      const target = document.getElementById(hashId) ?? document.getElementById(`form-${formId}`);
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [loading, forms]);
+
   return (
     <main>
       <section className="bg-[#079326] px-4 py-14 text-white sm:px-6 sm:py-20">
@@ -46,6 +56,13 @@ export default function FormsPage() {
         {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-800"><p>{error}</p><button type="button" onClick={() => setRetry((value) => value + 1)} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-2 font-semibold"><RefreshCw size={16} aria-hidden="true" /> Try again</button></div>}
         {!loading && !error && forms.length === 0 && <p className="rounded-xl border border-slate-200 bg-white p-8 text-slate-600">There are no forms available right now.</p>}
 
+        {!loading && forms.length > 0 && <nav aria-label="Quick links to form submissions" className="sticky top-20 z-30 -mx-4 mb-6 border-y border-slate-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur sm:-mx-6 sm:px-6">
+          <div className="mx-auto flex max-w-5xl items-center gap-2 overflow-x-auto">
+            <span className="shrink-0 pr-2 text-xs font-bold uppercase tracking-wide text-slate-500">Go to submit</span>
+            {forms.map((form) => <a key={form.id} href={`#upload-${form.id}`} className="inline-flex min-h-10 shrink-0 items-center rounded-lg border border-[#008EFE] px-3 py-2 text-sm font-semibold text-[#008EFE] hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">{form.title}</a>)}
+          </div>
+        </nav>}
+
         <div className="grid gap-5">
           {forms.map((form) => <PublicFormCard key={form.id} form={form} />)}
         </div>
@@ -65,6 +82,26 @@ function PublicFormCard({ form }: { form: FormTemplate }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [shareUrl, setShareUrl] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
+
+  async function shareForm() {
+    const url = `${window.location.origin}/forms?form=${encodeURIComponent(form.id)}#form-${encodeURIComponent(form.id)}`;
+    setShareUrl(url);
+    setShareMessage("");
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: form.title, url });
+        setShareMessage("Share link ready.");
+      } else {
+        await navigator.clipboard.writeText(url);
+        setShareMessage("Link copied.");
+      }
+    } catch (reason) {
+      if (reason instanceof Error && reason.name === "AbortError") return;
+      setShareMessage("Copy this link to share the form.");
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -97,7 +134,7 @@ function PublicFormCard({ form }: { form: FormTemplate }) {
   }
 
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <article id={`form-${form.id}`} className="scroll-mt-36 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
         <div className="min-w-0">
           <div className="flex items-start gap-3">
@@ -110,6 +147,7 @@ function PublicFormCard({ form }: { form: FormTemplate }) {
           </div>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
+          <button type="button" onClick={() => void shareForm()} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]"><Share2 size={16} aria-hidden="true" /> Share</button>
           <button type="button" onClick={() => setPreviewOpen((open) => !open)} aria-expanded={previewOpen} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#008EFE] px-3 py-2 text-sm font-semibold text-[#008EFE] hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">
             <Eye size={16} aria-hidden="true" /> {previewOpen ? "Close preview" : "View online"}
           </button>
@@ -118,10 +156,14 @@ function PublicFormCard({ form }: { form: FormTemplate }) {
           </a>
         </div>
       </div>
+      {shareUrl && <div className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-700">
+        <p role="status">{shareMessage}</p>
+        {shareMessage.startsWith("Copy") && <input readOnly value={shareUrl} aria-label={`Share link for ${form.title}`} onFocus={(event) => event.currentTarget.select()} className="mt-2 min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-xs text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]" />}
+      </div>}
 
       {previewOpen && <div className="mt-5"><FormDocumentViewer url={`${form.fileUrl}?preview=1`} fileName={form.fileName} fileType={form.fileType} /></div>}
 
-      <form onSubmit={submit} className="mt-5 border-t border-slate-100 pt-5">
+      <form id={`upload-${form.id}`} onSubmit={submit} className="scroll-mt-36 mt-5 border-t border-slate-100 pt-5">
         <label htmlFor={`completed-form-${form.id}`} className="block text-sm font-semibold text-slate-800">Upload your completed form</label>
         <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center">
           <input id={`completed-form-${form.id}`} name="completed-form" type="file" accept={accept} onChange={(event) => { setSelectedFile(event.target.files?.[0] ?? null); setError(""); setSuccess(""); }} className="block min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white text-sm text-slate-700 file:mr-3 file:min-h-11 file:border-0 file:bg-slate-100 file:px-3 file:font-semibold file:text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]" aria-describedby={`form-help-${form.id}`} />

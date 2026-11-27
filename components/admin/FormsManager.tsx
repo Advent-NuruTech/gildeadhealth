@@ -119,6 +119,19 @@ export default function FormsManager() {
         </button>
       </header>
 
+      <nav aria-label="Forms dashboard shortcuts" className="sticky top-16 z-20 mt-5 flex gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-white/95 p-2 shadow-sm backdrop-blur lg:top-3">
+        <a href="#completed-forms" className="inline-flex min-h-10 shrink-0 items-center rounded-lg bg-[#008EFE] px-3 py-2 text-sm font-bold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#079326]">Submissions ({submissions.length})</a>
+        <a href="#public-templates" className="inline-flex min-h-10 shrink-0 items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">Form links &amp; templates</a>
+        <a href="#new-form" className="inline-flex min-h-10 shrink-0 items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">Add a form</a>
+      </nav>
+
+      <section aria-labelledby="shareable-forms-heading" className="mt-5">
+        <h2 id="shareable-forms-heading" className="text-sm font-bold uppercase tracking-wider text-slate-500">Shareable public form links</h2>
+        {templates.filter((form) => form.enabled).length > 0
+          ? <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{templates.filter((form) => form.enabled).map((form) => <li key={form.id} className="rounded-xl border border-slate-200 bg-white p-4"><h3 className="font-bold text-slate-900">{form.title}</h3><div className="mt-3 flex flex-wrap gap-2"><a href={`/forms?form=${encodeURIComponent(form.id)}#form-${encodeURIComponent(form.id)}`} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center rounded-lg border border-[#008EFE] px-3 py-1.5 text-xs font-semibold text-[#008EFE] hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">Open form</a><a href={`/forms?form=${encodeURIComponent(form.id)}#upload-${encodeURIComponent(form.id)}`} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center rounded-lg bg-[#079326] px-3 py-1.5 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">Submission link</a></div></li>)}</ul>
+          : <p className="mt-3 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">{loading ? "Loading form links…" : "No active forms are available to share."}</p>}
+      </section>
+
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <section className="rounded-xl border border-[#008EFE] bg-white p-5">
           <p className="text-sm font-medium text-slate-600">Active public forms</p>
@@ -135,7 +148,7 @@ export default function FormsManager() {
       {error && <p role="alert" className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">{error}</p>}
       {notice && <p role="status" className="mt-6 rounded-xl bg-slate-50 p-4 text-sm font-medium text-[#079326]"><CheckCircle2 size={18} className="mr-2 inline" aria-hidden="true" />{notice}</p>}
 
-      <section className="mt-8" aria-labelledby="form-template-heading">
+      <section id="public-templates" className="scroll-mt-24 mt-8" aria-labelledby="form-template-heading">
         <div className="mb-4">
           <h2 id="form-template-heading" className="text-xl font-bold text-slate-950">Public form templates</h2>
           <p className="mt-1 text-sm leading-6 text-slate-600">Replace a template by uploading its updated PDF or Word file. Deleting a template removes it from the public page.</p>
@@ -145,10 +158,10 @@ export default function FormsManager() {
         <div className="grid gap-4">
           {templates.map((form) => <TemplateCard key={form.id} form={form} busy={busy === form.id} onSave={saveTemplate} onRemove={removeTemplate} />)}
         </div>
-        <NewTemplateForm busy={busy === "new"} onSave={saveTemplate} />
+        <div id="new-form" className="scroll-mt-24"><NewTemplateForm busy={busy === "new"} onSave={saveTemplate} /></div>
       </section>
 
-      <section className="mt-10" aria-labelledby="form-submissions-heading">
+      <section id="completed-forms" className="scroll-mt-24 mt-10" aria-labelledby="form-submissions-heading">
         <div className="mb-4">
           <h2 id="form-submissions-heading" className="text-xl font-bold text-slate-950">Completed forms</h2>
           <p className="mt-1 text-sm leading-6 text-slate-600">Only authorized administrators can access these private files. You can preview, download, or permanently delete a submission.</p>

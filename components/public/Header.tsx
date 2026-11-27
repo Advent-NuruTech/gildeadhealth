@@ -21,7 +21,6 @@ const links = [
 const programmeLinks = [
   { label: "Programmes", href: "/programmes", description: "Explore our support and services." },
   { label: "Resources", href: "/articles", description: "Read guides, articles, and study materials." },
-  { label: "Forms", href: "/forms", description: "View, download, complete, and submit client forms." },
   { label: "Invite GILEAD", href: "/invite-gilead", description: "Book GILEAD for your programme." },
 ];
 
@@ -149,6 +148,7 @@ export default function Header() {
             <Link href="/" className={linkClass("/")}>Home</Link>
             {renderDesktopMenu("programmes", "Programmes", programmeLinks)}
             <Link href="/products" className={linkClass("/products")}>Products</Link>
+            <Link href="/forms" className={linkClass("/forms")}>Forms</Link>
             {renderDesktopMenu("about", "About", aboutLinks)}
           </div>
           <button ref={menuButtonRef} type="button" aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen((value) => !value)} className="rounded-lg p-2.5 text-[#079326] hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE] xl:hidden">
