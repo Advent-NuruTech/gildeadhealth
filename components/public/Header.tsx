@@ -12,6 +12,7 @@ const links = [
   { label: "Programmes", href: "/programmes" },
   { label: "Products", href: "/products" },
   { label: "Resources", href: "/articles" },
+  { label: "Forms", href: "/forms" },
   { label: "Invite GILEAD", href: "/invite-gilead" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
@@ -20,6 +21,7 @@ const links = [
 const programmeLinks = [
   { label: "Programmes", href: "/programmes", description: "Explore our support and services." },
   { label: "Resources", href: "/articles", description: "Read guides, articles, and study materials." },
+  { label: "Forms", href: "/forms", description: "View, download, complete, and submit client forms." },
   { label: "Invite GILEAD", href: "/invite-gilead", description: "Book GILEAD for your programme." },
 ];
 

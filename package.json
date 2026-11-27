@@ -27,6 +27,7 @@
     "@aws-sdk/s3-request-presigner": "^3.1152.0",
     "bson": "^6.10.4",
     "cloudinary": "^2.11.0",
+    "docx-preview": "^0.3.7",
     "firebase": "^13.0.0",
     "firebase-admin": "^14.5.0",
     "framer-motion": "^12.34.3",

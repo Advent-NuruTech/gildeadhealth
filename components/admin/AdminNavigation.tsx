@@ -31,6 +31,7 @@ const links = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/articles", label: "Resources", icon: FileText },
+  { href: "/admin/forms", label: "Forms", icon: FileText },
   { href: "/admin/authors", label: "Authors", icon: Users },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/youtube", label: "YouTube", icon: Youtube },
